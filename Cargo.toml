@@ -9,5 +9,6 @@ edition = "2021"
 
 [workspace]
 members = [
-    "lecture_01"
+    "lecture_01",
+    "lecture_03"
 ]
