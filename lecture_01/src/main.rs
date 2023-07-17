@@ -7,6 +7,6 @@ fn main() {
     println!();
 
     println!("submod loop2 print ['A'..'z']");
-    loop_02::print_fn::print();
+    loop_02::print_fn::print_pretty();
     println!();
 }
