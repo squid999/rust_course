@@ -1,7 +1,7 @@
 Rust 所有权概念总结
 =================
 
-
+![Image text](./img/rust_2023_07_17.png)
 ### 所有权：
 
 * 一个值只能被一个变量所拥有，这个变量被称为所有者（Each value in Rust has a variable that’s called its owner）；
