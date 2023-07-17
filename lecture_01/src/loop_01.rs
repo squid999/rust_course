@@ -3,6 +3,6 @@ pub fn print() {
     let start: u8 = 'Z' as u8;
 
     for ch in (char::from(start)..='a').rev() {
-        println!("ch: {ch}");
+        println!("{:?}: {:?}", ch as u8, ch);
     }
 }
