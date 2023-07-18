@@ -64,5 +64,10 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
-    classes, clubs, courses, stu_class, stu_clubs, students,
+    classes,
+    clubs,
+    courses,
+    stu_class,
+    stu_clubs,
+    students,
 );

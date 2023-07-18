@@ -35,10 +35,22 @@ pub fn get(class_id: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse
     let conn = pool.get().unwrap();
 
     match Class::by_clsid(&class_id, &conn) {
-        Some(cls) => {
-            println!();
-            HttpResponse::Ok().json(cls)
-        }
+        Some(cls) => match StuClass::by_clsid(&class_id, &conn) {
+            Some(items) => {
+                let mut stu_list = Vec::<Student>::new();
+                for item in items {
+                    let stu = Student::by_sid(&item.sid, &conn).unwrap();
+                    stu_list.push(stu);
+                }
+                let clsf = ClassForm {
+                    class_id: cls.clsid,
+                    name: cls.name,
+                    stu_list: Some(stu_list),
+                };
+                HttpResponse::Ok().json(clsf)
+            }
+            None => HttpResponse::Ok().json(cls),
+        },
         _ => HttpResponse::NotFound().json("Not Found"),
     }
 }
