@@ -21,7 +21,8 @@ async fn main() -> std::io::Result<()> {
             .data(conn_pool.clone())
             .data(JsonConfig::default().limit(4096))
             .configure(services::student::init_routes)
-            .configure(services::club::init_routes)
+            .configure(services::stu_class::init_routes)
+            .configure(services::class::init_routes)
     })
     .bind("0.0.0.0:8111")?
     .run()

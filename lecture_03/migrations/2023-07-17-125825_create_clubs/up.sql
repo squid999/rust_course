@@ -1,9 +1,9 @@
 -- Your SQL goes here
 create table if not exists clubs
 (
-  id           int auto_increment primary key not null,
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name         varchar(50) unique,
   description  varchar(255),
-  create_at  datetime default current_timestamp not null,
+  created_at  datetime default current_timestamp not null,
   updated_at datetime default current_timestamp not null
 )

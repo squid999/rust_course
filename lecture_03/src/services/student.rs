@@ -1,46 +1,77 @@
 use actix_web::{web, HttpResponse};
 use serde::{Deserialize, Serialize};
 
-use crate::db::{models::Student, DbPool};
+use crate::db::{
+    models::{Class, StuClass, Student},
+    DbPool,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct StudentForm {
+    id: Option<i32>,
+    sid: String,
     name: Option<String>,
+    class: Option<String>,
 }
 
 pub fn create(stu_form: web::Json<StudentForm>, pool: web::Data<DbPool>) -> HttpResponse {
-    // let conn = pool.get().unwrap();
+    let conn = pool.get().unwrap();
 
-    // match Student::create(stu_form.name.as_deref(), &conn) {
-    //     Some(user) => HttpResponse::Ok().json(user),
-    //     _ => HttpResponse::InternalServerError().json("Could not create user"),
-    // }
-    HttpResponse::Ok().json("success")
+    match Student::create(&stu_form.sid, stu_form.name.as_deref(), &conn) {
+        Some(stu) => HttpResponse::Ok().json(stu),
+        _ => HttpResponse::InternalServerError().json("Could not create student object"),
+    }
+    // HttpResponse::Ok().json("success")
 }
 
 pub fn index(pool: web::Data<DbPool>) -> HttpResponse {
-    // let conn = pool.get().unwrap();
+    let conn = pool.get().unwrap();
 
-    // HttpResponse::Ok().json(Student::list(&conn))
-    HttpResponse::Ok().json("[]")
+    HttpResponse::Ok().json(Student::list(&conn))
+    // HttpResponse::Ok().json("[]")
 }
 
-pub fn get(id: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse {
-    // let conn = pool.get().unwrap();
+pub fn get(sid: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse {
+    let conn = pool.get().unwrap();
 
-    // match Student::by_id(&id, &conn) {
-    //     Some(stu) => HttpResponse::Ok().json(stu),
-    //     _ => HttpResponse::NotFound().json("Not Found"),
-    // }
-    println!("{:?}", id);
-    HttpResponse::NotFound().json("Not Found")
+    match Student::by_sid(&sid, &conn) {
+        Some(stu) => match StuClass::by_sid(&sid, &conn) {
+            Some(entry) => match Class::by_clsid(&entry.clsid, &conn) {
+                Some(cls) => {
+                    let scf = StudentForm {
+                        id: stu.id,
+                        sid: sid.to_string(),
+                        name: stu.name,
+                        class: cls.name,
+                    };
+                    HttpResponse::Ok().json(scf)
+                }
+                None => HttpResponse::Ok().json(stu),
+            },
+            None => HttpResponse::Ok().json(stu),
+        },
+        _ => HttpResponse::NotFound().json("Not Found"),
+    }
+    // HttpResponse::NotFound().json("Not Found")
+}
+
+pub fn del(sid: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse {
+    let conn = pool.get().unwrap();
+
+    match Student::remove(&sid, &conn) {
+        Ok(_) => match StuClass::remove(&sid, &conn) {
+            Ok(_) => HttpResponse::Ok().json("success"),
+            Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+        },
+        Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+    }
 }
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     /*
-     * index: curl -i -X GET -H "Content-Type: application/json" http://localhost:5000/users
-     * get: curl -i -X GET -H "Content-Type: application/json" http://localhost:5000/users/<id>
-     * post: curl -i -X POST -H "Content-Type: application/json" -d '{"email":"xxx", "phone": "yyy"}' http://localhost:5000/users
+     * index: curl -i -X GET -H "Content-Type: application/json" http://localhost:8111/students
+     * get: curl -i -X GET -H "Content-Type: application/json" http://localhost:8111/students/<sid>
+     * post: curl -i -X POST -H "Content-Type: application/json" -d '{"email":"xxx", "phone": "yyy"}' http://localhost:8111/students
      */
 
     cfg.service(
@@ -48,5 +79,9 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .route(web::post().to(create))
             .route(web::get().to(index)),
     )
-    .service(web::scope("api/v1/students").route("/{id}", web::get().to(get)));
+    .service(
+        web::resource("api/v1/students/{sid}")
+            .route(web::get().to(get))
+            .route(web::delete().to(del)),
+    );
 }
