@@ -73,6 +73,23 @@ impl Student {
         Self::by_sid(&sid, conn)
     }
 
+    pub fn update(
+        sid_str: &str,
+        name_str: Option<&str>,
+        conn: &SqliteConnection,
+    ) -> QueryResult<usize> {
+        use super::schema::students::dsl::{name, sid};
+        if name_str.is_none() {
+            return Ok(0);
+        }
+
+        diesel::update(stu_dsl)
+            .filter(sid.eq(sid_str))
+            .set(name.eq(name_str.as_deref()))
+            .execute(conn)
+        // stu_dsl.filter(sid.eq(sid_str))).set().execute(conn)
+    }
+
     pub fn remove(sid_str: &str, conn: &SqliteConnection) -> QueryResult<usize> {
         use super::schema::students::dsl::sid;
         diesel::delete(stu_dsl.filter(sid.eq(sid_str))).execute(conn)

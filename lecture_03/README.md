@@ -95,6 +95,20 @@ GET /api/v1/students/002
     "updated_at": "2023-07-18T13:09:02"
 }
 ```
+#### 更新学生名字
+```api
+PUT /api/v1/students
+{"sid": "003", "name": "Gof"}
+```
+```json
+{
+    "id": 3,
+    "sid": "003",
+    "name": "Gof",
+    "created_at": "2023-07-18T13:31:56",
+    "updated_at": "2023-07-18T13:31:56"
+}
+```
 #### 删除学生项
 ```api
 DELETE /api/v1/students/001

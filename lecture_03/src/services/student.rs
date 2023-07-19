@@ -55,6 +55,29 @@ pub fn get(sid: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse {
     // HttpResponse::NotFound().json("Not Found")
 }
 
+pub fn update(stu_form: web::Json<StudentForm>, pool: web::Data<DbPool>) -> HttpResponse {
+    let conn = pool.get().unwrap();
+
+    match stu_form.name.as_ref() {
+        Some(name_) => {
+            if name_.len() == 0 {
+                return HttpResponse::BadRequest().json("name field needed");
+            }
+        }
+
+        None => {
+            return HttpResponse::BadRequest().json("name field needed");
+        }
+    };
+    match Student::update(&stu_form.sid, stu_form.name.as_deref(), &conn) {
+        Ok(_) => match Student::by_sid(&stu_form.sid, &conn) {
+            Some(stu) => HttpResponse::Ok().json(stu),
+            _ => HttpResponse::Ok().json(""),
+        },
+        Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+    }
+}
+
 pub fn del(sid: web::Path<String>, pool: web::Data<DbPool>) -> HttpResponse {
     let conn = pool.get().unwrap();
 
@@ -77,7 +100,8 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("api/v1/students")
             .route(web::post().to(create))
-            .route(web::get().to(index)),
+            .route(web::get().to(index))
+            .route(web::put().to(update)),
     )
     .service(
         web::resource("api/v1/students/{sid}")

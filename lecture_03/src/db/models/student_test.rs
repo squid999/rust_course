@@ -91,3 +91,17 @@ fn del_stu_by_sid() {
         None => assert!(true),
     }
 }
+
+#[test]
+fn update_name_by_sid() {
+    let conn = establish_connection().get().unwrap();
+    let sid = "001";
+    let name = Some("Tom");
+
+    let stu = Student::create(sid, name, &conn).unwrap();
+
+    Student::update(sid, Some("Jim"), &conn);
+
+    let existing_stu = Student::by_sid(sid, &conn).unwrap();
+    assert_eq!(existing_stu.name.as_deref(), Some("Jim"));
+}
