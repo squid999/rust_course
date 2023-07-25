@@ -1,16 +1,8 @@
 [package]
-name = "rust_course"
+name = "lecture_05"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
-[workspace]
-members = [
-    "lecture_01",
-    "lecture_03",
-    "lecture_04",
-    "lecture_05"
-]

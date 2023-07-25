@@ -253,3 +253,6 @@ POST localhost:8111/api/v1/stucls
 ## Reference
 * [Actix-web](https://actix.rs/)
 * [Diesel](https://diesel.rs/)
+* [Student-management-system-backend](https://github.com/SunDoge/student-management-system-backend)
+* [diesel-sqlite](https://github.com/ukchukx/diesel-sqlite/)
+* [Using SQLite with Rust and Actix Web](https://levelup.gitconnected.com/using-sqlite-with-rust-and-actix-web-with-tests-11a935ac3d95)
