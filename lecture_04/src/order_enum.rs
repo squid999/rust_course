@@ -8,6 +8,16 @@ pub enum OrderType {
     StopOrder(oto::StopOrder),
 }
 
+impl OrderType {
+    pub fn detail(&self) -> String {
+        match &self {
+            Self::MarketOrder(mkt) => mkt.detail(),
+            Self::LimitOrder(lmt) => lmt.detail(),
+            Self::StopOrder(stp) => stp.detail(),
+        }
+    }
+}
+
 pub fn poll_orders() {
     let order1 = OrderType::MarketOrder(oto::MarketOrder::new(
         "mkt".to_string(),
@@ -32,16 +42,6 @@ pub fn poll_orders() {
     let incoming_orders = vec![order1, order2, order3];
 
     for order in incoming_orders.iter() {
-        match order {
-            OrderType::MarketOrder(mkt) => {
-                println!("{}", mkt.detail());
-            }
-            OrderType::LimitOrder(lmt) => {
-                println!("{}", lmt.detail());
-            }
-            OrderType::StopOrder(stp) => {
-                println!("{}", stp.detail());
-            }
-        }
+        println!("{}", order.detail());
     }
 }

@@ -2,7 +2,7 @@ Lecture 04
 ===============
 
 ## Project 
-### Proj 1.
+### Proj 1.。
 #### 定义三种不同类型的交易订单
 ```rust
 #[derive(Debug)]
@@ -97,6 +97,23 @@ impl StopOrder {
 使用枚举包裹三个不同的类型，并放入一个 Vec 中，对 Vec 进行遍历，调用三种不同类型的各自的方法
 
 ```rust
+pub enum OrderType {
+    MarketOrder(oto::MarketOrder),
+    LimitOrder(oto::LimitOrder),
+    StopOrder(oto::StopOrder),
+}
+
+impl OrderType {
+    pub fn detail(&self) -> String {
+        match &self {
+            Self::MarketOrder(mkt) => mkt.detail(),
+            Self::LimitOrder(lmt) => lmt.detail(),
+            Self::StopOrder(stp) => stp.detail(),
+        }
+    }
+}
+
+
 
 use super::order_trait_object as oto;
 
@@ -124,17 +141,7 @@ pub fn poll_orders() {
     let incoming_orders = vec![order1, order2, order3];
 
     for order in incoming_orders.iter() {
-        match order {
-            OrderType::MarketOrder(mkt) => {
-                println!("{}", mkt.detail());
-            }
-            OrderType::LimitOrder(lmt) => {
-                println!("{}", lmt.detail());
-            }
-            OrderType::StopOrder(stp) => {
-                println!("{}", stp.detail());
-            }
-        }
+        println!("{}", order.detail());
     }
 }
 
@@ -210,6 +217,15 @@ pub fn poll_orders() {
     }
 }
 ```
+
+##### Case 区别总结
+ 说明其上两种不同实现方法的区别
+ 1. 枚举可以内嵌多种类型数据，与具体的数据绑定，同时可以为枚举定义方法，统一行为
+ 2. 对枚举的类型分析需要用模式匹配来判断具体的类型
+ 3. 当在某个上下文中需要满足某个 trait 的类型，且这样的类型可能有很多，当前上下文无法确定会得到哪一个类型时， 用 trait object 来统一处理行为；
+ 4. trait object 也是一种延迟绑定，它让决策可以延迟到运行时；
+ 5. 枚举可以明确类型，trait object 不关心具体类型，而只关心行为
+ 6. 枚举为静态表达，运行中有更好的性能;trait object 拥有较好的扩展性和丑行能力
 
 ### Proj 2.
 搜索相关文档，为你自己定义的一个类型或多个类型实现加法运算（用符号 +），并构思使用 Trait Object 实现类型方法的调用
