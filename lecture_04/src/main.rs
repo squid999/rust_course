@@ -6,6 +6,7 @@ use matrix::Matrix;
 
 fn project01() {
     println!("\nshow enum vector case:");
+    order_enum::poll_orders();
     println!("\nshow trait object case:");
     order_trait_object::poll_orders();
 }

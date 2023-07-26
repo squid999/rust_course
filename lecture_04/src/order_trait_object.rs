@@ -5,71 +5,92 @@ trait Order {
     fn order_id(&self) -> String;
 }
 
-enum OrderStatus {
-    Submitted,
-    Accepted,
-    Rejected,
-    Canceled,
+#[derive(Debug)]
+pub struct MarketOrder {
+    order_id: String,
+    contract: String,
+    multiplier: u32,
+    volume: u32,
 }
 
 #[derive(Debug)]
-struct MarketOrder {
+pub struct LimitOrder {
     order_id: String,
+    contract: String,
     multiplier: u32,
     price: f64,
     volume: u32,
 }
 
 #[derive(Debug)]
-struct LimitOrder {
+pub struct StopOrder {
     order_id: String,
-    multiplier: u32,
-    price: f64,
-    volume: u32,
-}
-
-#[derive(Debug)]
-struct StopOrder {
-    order_id: String,
+    contract: String,
     price: f64,
     volume: u32,
 }
 
 impl MarketOrder {
-    fn new(order_id: String, price: f64, volume: u32, multiplier: u32) -> MarketOrder {
+    pub fn new(order_id: String, contract: String, volume: u32, multiplier: u32) -> MarketOrder {
         MarketOrder {
             order_id,
-            price,
+            contract,
             volume,
             multiplier,
         }
+    }
+    pub fn detail(&self) -> String {
+        format!(
+            "MarketOrder[{}] <{}>:  {}@?",
+            self.order_id, self.contract, self.volume
+        )
     }
 }
 
 impl LimitOrder {
-    fn new(order_id: String, price: f64, volume: u32, multiplier: u32) -> LimitOrder {
+    pub fn new(
+        order_id: String,
+        contract: String,
+        price: f64,
+        volume: u32,
+        multiplier: u32,
+    ) -> LimitOrder {
         LimitOrder {
             order_id,
+            contract,
             price,
             volume,
             multiplier,
         }
     }
+    pub fn detail(&self) -> String {
+        format!(
+            "LimitOrder[{}] <{}>: {}@{}",
+            self.order_id, self.contract, self.volume, self.price
+        )
+    }
 }
 
 impl StopOrder {
-    fn new(order_id: String, price: f64, volume: u32) -> StopOrder {
+    pub fn new(order_id: String, contract: String, price: f64, volume: u32) -> StopOrder {
         StopOrder {
             order_id,
+            contract,
             price,
             volume,
         }
+    }
+    pub fn detail(&self) -> String {
+        format!(
+            "StopOrder[{}] <{}>: {}@{}",
+            self.order_id, self.contract, self.volume, self.price
+        )
     }
 }
 
 impl Order for MarketOrder {
     fn turnover(&self) -> f64 {
-        self.price * (self.multiplier as f64) * (self.volume as f64)
+        40000f64 * (self.multiplier as f64) * (self.volume as f64)
     }
 
     fn order_id(&self) -> String {
@@ -111,7 +132,7 @@ pub fn poll_orders() {
                 // let order = MarketOrder::new(order_id, 100f64, i, 10);
                 let order = Box::new(MarketOrder {
                     order_id: order_id,
-                    price: 100f64,
+                    contract: "BTC/UTC".to_string(),
                     volume: i + 1,
                     multiplier: 10,
                 });
@@ -121,6 +142,7 @@ pub fn poll_orders() {
                 // let order_id = format!("order_{:05}", i);
                 let order = Box::new(LimitOrder {
                     order_id: order_id,
+                    contract: "BTC/UTC".to_string(),
                     price: 100f64,
                     volume: i,
                     multiplier: 10,
@@ -132,6 +154,7 @@ pub fn poll_orders() {
                 // let order = MarketOrder::new(order_id, 100f64, i, 10);
                 let order = Box::new(StopOrder {
                     order_id: order_id,
+                    contract: "BTC/UTC".to_string(),
                     price: 100f64,
                     volume: i,
                 });
@@ -159,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_dyn_type_name() {
-        let order1 = MarketOrder::new("aaa".to_string(), 42f64, 1, 10);
+        let order1 = MarketOrder::new("aaa".to_string(), "BTC/UTC".to_string(), 1, 10);
         let n = get_type_name(&order1);
 
         assert_eq!(n, "lecture_04::order_trait_object::MarketOrder");
