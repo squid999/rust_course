@@ -31,11 +31,23 @@ macro_rules! hashmap_v2 {
 }
 
 fn sample1() {
-    let map = hashmap_v1!("a"=>1, "b"=> 2, "c" =>3);
+    let map = hashmap_v1!("a"=>1, "b"=> 2, "c" =>3, ,,,);
     for (key, value) in &map {
         println!("{} => {}", key, value)
     }
-    assert_eq!(map.get("c"), Some(&3))
+    assert_eq!(map.get("c"), Some(&3));
+
+    let m2 = hashmap_v1!(
+        "a"  => hashmap_v1!(),
+        "b"  => hashmap_v1!(
+            22 => 220,
+            33 => 330,
+        )
+    );
+
+    for (key, value) in &m2 {
+        println!("{} => {:?}", key, value);
+    }
 }
 
 fn sample2() {
